@@ -38,13 +38,13 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
         <Text variant="titleLarge" style={styles.title}>
           What Our Customers Say
         </Text>
-        {onViewAll && (
+        {/* {onViewAll && (
           <TouchableOpacity onPress={onViewAll} activeOpacity={0.7}>
             <Text variant="bodyMedium" style={styles.viewAll}>
               View All
             </Text>
           </TouchableOpacity>
-        )}
+        )} */}
       </View>
       <ScrollView
         horizontal
@@ -147,6 +147,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+
+
+
+
+
+
 
 
 

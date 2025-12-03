@@ -15,11 +15,13 @@ module.exports = {
       backgroundColor: '#ffffff',
     },
     ios: {
+      bundleIdentifier: 'com.baihub.app',
       supportsTablet: true,
       infoPlist: {
         NSLocationWhenInUseUsageDescription: 'This app needs access to your location to automatically detect your city.',
         NSLocationAlwaysUsageDescription: 'This app needs access to your location to automatically detect your city.',
       },
+      googleServicesFile: './GoogleService-Info.plist',
     },
     android: {
       adaptiveIcon: {
@@ -32,17 +34,22 @@ module.exports = {
         'ACCESS_FINE_LOCATION',
         'ACCESS_COARSE_LOCATION',
       ],
-      package: 'com.arpit_jain49.baihubmobile',
+      package: 'com.baihub.app',
+      googleServicesFile: './google-services.json',
     },
     web: {
       favicon: './assets/favicon.png',
       bundler: 'metro',
     },
     extra: {
-      API_BASE_URL: process.env.API_BASE_URL || 'http://10.0.2.2:3000',
+      API_BASE_URL: process.env.API_BASE_URL || 'https://alec-nonexpressive-overrigorously.ngrok-free.dev',
       API_TIMEOUT: process.env.API_TIMEOUT || '30000',
       ENVIRONMENT: process.env.ENVIRONMENT || 'development',
     },
+    plugins: [
+      '@react-native-firebase/app',
+      './plugins/with-google-services.js',
+    ],
   },
 };
 

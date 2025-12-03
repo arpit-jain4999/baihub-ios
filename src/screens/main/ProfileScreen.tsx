@@ -1,14 +1,49 @@
 // Profile screen
 
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Linking, Alert } from 'react-native';
 import { Text, Card, Avatar, Button, Divider } from 'react-native-paper';
 import { useAuthStore } from '../../store';
 import { useNavigation } from '@react-navigation/native';
 
+const SUPPORT_WHATSAPP_NUMBER = '919810468183';
+const SUPPORT_MESSAGE = 'Hello! I need help';
+const TERMS_URL = 'https://www.baihub.co.in/terms-and-conditions';
+const PRIVACY_URL = 'https://www.baihub.co.in/privacy-policy';
+const ABOUT_URL = 'https://www.baihub.co.in/about';
+
 export default function ProfileScreen() {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const navigation = useNavigation();
+
+  const handleHelpSupport = async () => {
+    const whatsappUrl = `whatsapp://send?phone=${SUPPORT_WHATSAPP_NUMBER}&text=${encodeURIComponent(SUPPORT_MESSAGE)}`;
+    
+    try {
+      const canOpen = await Linking.canOpenURL(whatsappUrl);
+      if (canOpen) {
+        await Linking.openURL(whatsappUrl);
+      } else {
+        // Fallback to web WhatsApp
+        const webUrl = `https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent(SUPPORT_MESSAGE)}`;
+        await Linking.openURL(webUrl);
+      }
+    } catch (error) {
+      Alert.alert(
+        'Unable to open WhatsApp',
+        'Please make sure WhatsApp is installed on your device.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
+  const openUrl = async (url: string) => {
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      Alert.alert('Error', 'Unable to open the link.');
+    }
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -25,7 +60,7 @@ export default function ProfileScreen() {
               : user?.firstName || user?.email || 'User'}
           </Text>
           <Text variant="bodyMedium" style={styles.email}>
-            {user?.email || 'No email'}
+            {user?.phoneNumber?.substring(0, 3) + " " + user?.phoneNumber?.substring(3, 14)}
           </Text>
         </Card.Content>
       </Card>
@@ -34,29 +69,62 @@ export default function ProfileScreen() {
         <Card.Content>
           <Button
             mode="text"
-            onPress={() => navigation.navigate('Settings' as never)}
-            icon="cog"
+            onPress={() => navigation.navigate('Orders' as never)}
+            icon="clipboard-list"
             style={styles.menuItem}
+            textColor="#000000"
           >
-            Settings
+            My Orders
           </Button>
           <Divider />
           <Button
             mode="text"
-            onPress={() => {}}
+            onPress={handleHelpSupport}
             icon="help-circle"
             style={styles.menuItem}
+            textColor="#000000"
           >
             Help & Support
           </Button>
           <Divider />
           <Button
             mode="text"
-            onPress={() => {}}
+            onPress={() => openUrl(ABOUT_URL)}
             icon="information"
             style={styles.menuItem}
+            textColor="#000000"
           >
             About
+          </Button>
+          <Divider />
+          <Button
+            mode="text"
+            onPress={() => openUrl(TERMS_URL)}
+            icon="file-document-outline"
+            style={styles.menuItem}
+            textColor="#000000"
+          >
+            Terms & Conditions
+          </Button>
+          <Divider />
+          <Button
+            mode="text"
+            onPress={() => openUrl(PRIVACY_URL)}
+            icon="shield-lock-outline"
+            style={styles.menuItem}
+            textColor="#000000"
+          >
+            Privacy Policy
+          </Button>
+          <Divider />
+          <Button
+            mode="text"
+            onPress={logout}
+            icon="logout"
+            style={styles.menuItem}
+            textColor="#000000"
+          >
+            Logout
           </Button>
         </Card.Content>
       </Card>
@@ -92,6 +160,7 @@ const styles = StyleSheet.create({
   menuItem: {
     justifyContent: 'flex-start',
     paddingVertical: 12,
+    alignItems: "flex-start",
   },
 });
 

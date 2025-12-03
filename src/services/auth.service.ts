@@ -30,7 +30,7 @@ class AuthService {
 
       if (response.success && response.data) {
         logger.info('OTP requested successfully', {
-          phoneNumber: params.phoneNumber,
+          phoneNumber: "+91"+params.phoneNumber,
           isNewUser: response.data.isNewUser,
         });
         return response.data;

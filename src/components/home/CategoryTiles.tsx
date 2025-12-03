@@ -1,10 +1,11 @@
 // Category Tiles component
 
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Category } from '../../types/home.types';
+import { baihubAnalytics } from '../../services/baihub-analytics.service';
 
 interface CategoryTilesProps {
   categories: Category[];
@@ -18,6 +19,9 @@ export const CategoryTiles: React.FC<CategoryTilesProps> = ({
   if (!categories || categories.length === 0) {
     return null;
   }
+
+  console.log('categories', categories);
+
 
   return (
     <View style={styles.container}>
@@ -33,11 +37,19 @@ export const CategoryTiles: React.FC<CategoryTilesProps> = ({
           <TouchableOpacity
             key={category.id}
             style={styles.tile}
-            onPress={() => onCategoryPress?.(category)}
+            onPress={async () => {
+              onCategoryPress?.(category);
+            }}
             activeOpacity={0.7}
           >
             <View style={styles.iconContainer}>
-              {category.icon ? (
+              {category.displayImage?.imageUrl ? (
+                <Image 
+                  source={{ uri: category.displayImage.imageUrl }} 
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              ) : category.icon ? (
                 <Icon name={category.icon} size={32} color="#f9cb00" />
               ) : (
                 <Icon name="folder" size={32} color="#f9cb00" />
@@ -88,6 +100,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
+    overflow: 'hidden',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
   name: {
     textAlign: 'center',
@@ -95,6 +112,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+
+
+
+
+
+
 
 
 

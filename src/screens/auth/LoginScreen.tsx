@@ -14,6 +14,7 @@ import { Text, TextInput, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAuthStore } from '../../store';
 import { logger } from '../../utils/logger';
+import { baihubAnalytics } from '../../services/baihub-analytics.service';
 
 export default function LoginScreen({ navigation }: any) {
   const { requestOtp } = useAuthStore();
@@ -49,8 +50,15 @@ export default function LoginScreen({ navigation }: any) {
 
     setIsLoading(true);
     try {
-      const response = await requestOtp({ phoneNumber: formattedPhone });
+      const response = await requestOtp({ phoneNumber: "+91"+formattedPhone });
       logger.info('OTP requested successfully', { isNewUser: response.isNewUser });
+      
+      // Log analytics event
+      await baihubAnalytics.logOtpRequested({
+        phone_number: "+91"+formattedPhone,
+        user_type: response.isNewUser ? 'new' : 'old',
+        screen: 'login',
+      });
       
       // Navigate to OTP verification screen
       navigation.navigate('OTPVerification', { phoneNumber: formattedPhone });
@@ -60,11 +68,6 @@ export default function LoginScreen({ navigation }: any) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSkip = () => {
-    // Navigate to main app or handle skip logic
-    logger.info('Skip login pressed');
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -82,14 +85,6 @@ export default function LoginScreen({ navigation }: any) {
         showsVerticalScrollIndicator={false}
       >
         {/* Skip Button */}
-        <TouchableOpacity
-          style={styles.skipButton}
-          onPress={handleSkip}
-          activeOpacity={0.7}
-        >
-          <RNText style={styles.skipText}>Skip</RNText>
-          <Icon name="chevron-right" size={20} color="#000" />
-        </TouchableOpacity>
 
         {/* Welcome Section */}
         <View style={styles.welcomeSection}>

@@ -9,8 +9,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Text, Button } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuthStore } from '../../store';
 import { useHomePage } from '../../hooks/useHomePage';
+import { RootStackParamList } from '../../navigation/types';
 import {
   HeroBanner,
   CategoryTiles,
@@ -19,20 +22,46 @@ import {
   AreasServed,
 } from '../../components/home';
 import { Category, Review, SecondaryBanner } from '../../types/home.types';
+import { baihubAnalytics } from '../../services/baihub-analytics.service';
+import { useEffect, useRef } from 'react';
+
+type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function HomeScreen() {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const { user, logout } = useAuthStore();
   const { data, loading, error, refresh } = useHomePage({
     city: user?.city,
     limit: 8,
     testimonialLimit: 5,
   });
+  const hasLoggedHomeVisit = useRef(false);
 
-  const handleCategoryPress = useCallback((category: Category) => {
-    // Navigate to category details
-    console.log('Category pressed:', category);
-    // navigation.navigate('CategoryDetails', { categoryId: category.id });
-  }, []);
+  // Log home page visit on first mount
+  useEffect(() => {
+    if (!hasLoggedHomeVisit.current && !loading && data) {
+      hasLoggedHomeVisit.current = true;
+      baihubAnalytics.logHomePageVisited();
+    }
+  }, [loading, data]);
+
+  const handleCategoryPress = useCallback(
+    async (category: Category) => {
+      // Log analytics event
+      await baihubAnalytics.logServiceSelected({
+        service_id: category.id,
+        service_name: category.name,
+        screen: 'home',
+      });
+      // Navigate to area selection for the selected category
+      const rootNavigator = navigation.getParent() || navigation;
+      (rootNavigator as any).navigate('AreaSelection', {
+        categoryId: category.id,
+        categoryName: category.name,
+      });
+    },
+    [navigation]
+  );
 
   const handleTestimonialPress = useCallback((review: Review) => {
     // Navigate to review details or service
@@ -44,10 +73,29 @@ export default function HomeScreen() {
     console.log('Banner pressed:', banner);
   }, []);
 
-  const handleAreaPress = useCallback((areaName: string) => {
-    // Filter by area or navigate to area services
-    console.log('Area pressed:', areaName);
-  }, []);
+  const handleAreaPress = useCallback(
+    async (areaId: string, areaName: string) => {
+      // Log analytics event
+      await baihubAnalytics.logAreaSelected({
+        area_id: areaId,
+        area_name: areaName,
+        screen: 'home',
+      });
+      // Navigate to services listing for the selected area
+      if (!areaId) {
+        console.warn('Area ID is missing for:', areaName);
+        return;
+      }
+      
+      // Navigate using root navigator (ServicesListing is at root level)
+      const rootNavigator = navigation.getParent() || navigation;
+      (rootNavigator as any).navigate('ServicesListing', {
+        areaId,
+        areaName,
+      });
+    },
+    [navigation]
+  );
 
   const handleViewAllCategories = useCallback(() => {
     // Navigate to all categories
@@ -116,9 +164,15 @@ export default function HomeScreen() {
       {data.heroBanner && (
         <HeroBanner
           banner={data.heroBanner}
-          onPress={() => {
-            // Handle hero banner press - could navigate based on actionUrl
-            console.log('Hero banner pressed:', data.heroBanner.actionUrl);
+          onPress={async () => {
+            // Log analytics event
+            await baihubAnalytics.logHeroBannerClicked({
+              banner_url: data.heroBanner?.imageUrl,
+              banner_title: data.heroBanner?.title,
+            });
+            // Navigate to area selection (without categoryId) to start booking flow
+            const rootNavigator = navigation.getParent() || navigation;
+            (rootNavigator as any).navigate('AreaSelection', {});
           }}
         />
       )}
@@ -157,17 +211,6 @@ export default function HomeScreen() {
         />
       )}
 
-      {/* Debug: Logout button (remove in production) */}
-      {__DEV__ && (
-        <Button
-          mode="outlined"
-          onPress={logout}
-          style={styles.logoutButton}
-          icon="logout"
-        >
-          Logout
-        </Button>
-      )}
     </ScrollView>
   );
 }

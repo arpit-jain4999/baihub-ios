@@ -19,6 +19,7 @@ import { userService } from '../../services/user.service';
 import { logger } from '../../utils/logger';
 import { Storage } from '../../utils/storage';
 import { STORAGE_KEYS } from '../../utils/constants';
+import { baihubAnalytics } from '../../services/baihub-analytics.service';
 
 const LANGUAGES = [
   { label: 'English', value: 'en' },
@@ -153,6 +154,13 @@ export default function UserDetailsScreen({ navigation }: any) {
 
       const updatedUser = await userService.updateProfile(updateData);
       logger.info('User details updated successfully');
+      
+      // Log analytics event
+      await baihubAnalytics.logOnboardingDetailsFilled({
+        phone_number: user?.phoneNumber || emailOrPhone.trim(),
+        screen: 'otp_screen',
+        user_location: city.trim(),
+      });
       
       // Update user in store
       const { setNewUserComplete, initialize } = useAuthStore.getState();

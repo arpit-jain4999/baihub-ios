@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "327231273268",
+    "project_id": "baihub-app-rn",
+    "storage_bucket": "baihub-app-rn.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:327231273268:android:39bd65973680909afe8d61",
+        "android_client_info": {
+          "package_name": "com.baihub.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCN0qbPX2OKbQDlJPeO7nzEq0SPiXpCoXQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

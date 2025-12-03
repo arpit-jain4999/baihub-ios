@@ -1,14 +1,14 @@
 // Areas Served component
 
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Text, Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AreasServed as AreasServedType } from '../../types/home.types';
 
 interface AreasServedProps {
   areas: AreasServedType;
-  onAreaPress?: (areaName: string) => void;
+  onAreaPress?: (areaId: string, areaName: string) => void;
   onViewAll?: () => void;
 }
 
@@ -42,12 +42,22 @@ export const AreasServed: React.FC<AreasServedProps> = ({
       <View style={styles.grid}>
         {displayedCities.map((city, index) => (
           <TouchableOpacity
-            key={index}
+            key={city.id || index}
             style={styles.cityCard}
-            onPress={() => onAreaPress?.(city.name)}
+            onPress={() => onAreaPress?.(city.id || '', city.name)}
             activeOpacity={0.7}
           >
-            <Icon name="map-marker" size={20} color="#f9cb00" />
+            {city.displayImage?.imageUrl ? (
+              <View style={styles.imageContainer}>
+                <Image 
+                  source={{ uri: city.displayImage.imageUrl }} 
+                  style={styles.areaImage}
+                  resizeMode="cover"
+                />
+              </View>
+            ) : (
+              <Icon name="map-marker" size={20} color="#f9cb00" />
+            )}
             <Text variant="bodyMedium" style={styles.cityName}>
               {city.name}
             </Text>
@@ -109,7 +119,23 @@ const styles = StyleSheet.create({
     color: '#666666',
     fontSize: 12,
   },
+  imageContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 4,
+  },
+  areaImage: {
+    width: '100%',
+    height: '100%',
+  },
 });
+
+
+
+
+
 
 
 

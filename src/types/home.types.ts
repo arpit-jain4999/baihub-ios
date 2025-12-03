@@ -3,12 +3,19 @@
 export interface HeroBanner {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle?: string; // Optional - can be empty string or undefined
   imageUrl: string;
-  actionUrl: string;
-  actionText: string;
+  actionUrl?: string; // Optional - can be empty string or undefined
+  actionText?: string; // Optional - can be empty string or undefined
   isActive: boolean;
   order: number;
+}
+
+export interface DisplayImage {
+  id: string;
+  key: string;
+  baseUrl: string;
+  imageUrl: string;
 }
 
 export interface Category {
@@ -17,6 +24,7 @@ export interface Category {
   slug: string;
   icon?: string;
   image?: string;
+  displayImage?: DisplayImage;
   order: number;
 }
 
@@ -37,18 +45,20 @@ export interface Review {
 export interface SecondaryBanner {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle?: string; // Optional - can be empty string or undefined
   imageUrl: string;
-  actionUrl: string;
-  actionText: string;
+  actionUrl?: string; // Optional - can be empty string or undefined
+  actionText?: string; // Optional - can be empty string or undefined
   isActive: boolean;
   order: number;
 }
 
 export interface AreaServed {
+  id?: string;
   name: string;
   serviceCount: number;
   isActive: boolean;
+  displayImage?: DisplayImage;
   createdAt?: string;
 }
 
@@ -58,7 +68,7 @@ export interface AreasServed {
 }
 
 export interface HomePageData {
-  heroBanner: HeroBanner;
+  heroBanner: HeroBanner | null; // Can be null if no hero banner is configured
   quickCategories: Category[];
   featuredTestimonials: Review[];
   secondaryBanners: SecondaryBanner[];
@@ -71,6 +81,44 @@ export interface AreasServedResponse {
   limit: number;
   offset: number;
 }
+
+export interface Area {
+  id: string;
+  name: string;
+  pincode?: string;
+  state?: string;
+  country?: string;
+  latitude?: string;
+  longitude?: string;
+  isActive: boolean;
+  serviceCount?: number;
+  displayImage?: DisplayImage;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
+  categories?: Category[];
+}
+
+export interface Plan {
+  id: string;
+  title: string;
+  description?: string;
+  amount?: number | null;
+  price: {
+    total: number;
+    amount: number;
+    discount: number;
+  };
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
+}
+
+
+
+
+
 
 
 

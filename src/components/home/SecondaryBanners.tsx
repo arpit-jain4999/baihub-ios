@@ -41,21 +41,17 @@ export const SecondaryBanners: React.FC<SecondaryBannersProps> = ({
             />
             <View style={styles.overlay}>
               <View style={styles.content}>
-                <Text variant="titleLarge" style={styles.title}>
-                  {banner.title}
-                </Text>
-                <Text variant="bodyLarge" style={styles.subtitle}>
-                  {banner.subtitle}
-                </Text>
-                <Button
-                  mode="contained"
-                  onPress={() => onBannerPress?.(banner)}
-                  style={styles.button}
-                  contentStyle={styles.buttonContent}
-                  labelStyle={styles.buttonLabel}
-                >
-                  {banner.actionText}
-                </Button>
+                {banner.actionText && (
+                  <Button
+                    mode="contained"
+                    onPress={() => onBannerPress?.(banner)}
+                    style={styles.button}
+                    contentStyle={styles.buttonContent}
+                    labelStyle={styles.buttonLabel}
+                  >
+                    {banner.actionText}
+                  </Button>
+                )}
               </View>
             </View>
           </TouchableOpacity>
@@ -92,7 +88,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -126,6 +121,12 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
 });
+
+
+
+
+
+
 
 
 

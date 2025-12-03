@@ -15,6 +15,7 @@ import { Text, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAuthStore } from '../../store';
 import { logger } from '../../utils/logger';
+import { baihubAnalytics } from '../../services/baihub-analytics.service';
 
 export default function OTPVerificationScreen({ navigation, route }: any) {
   const { verifyOtp, phoneNumber, isLoading, error, requestOtp } = useAuthStore();
@@ -81,6 +82,14 @@ export default function OTPVerificationScreen({ navigation, route }: any) {
       
       logger.info('OTP verified successfully', { isNewUser: result.isNewUser });
       
+      // Log analytics event
+      const { isNewUser } = useAuthStore.getState();
+      await baihubAnalytics.logVerifyOtpClicked({
+        phone_number: phone,
+        user_type: isNewUser ? 'new' : 'old',
+        screen: 'otp_screen',
+      });
+      
       // Navigate based on isNewUser flag (from requestOtp response)
       if (result.isNewUser) {
         // New user - navigate to user details screen for onboarding
@@ -99,7 +108,14 @@ export default function OTPVerificationScreen({ navigation, route }: any) {
     if (!canResend || !phone) return;
 
     try {
-      await requestOtp({ phoneNumber: phone });
+      const response = await requestOtp({ phoneNumber: phone });
+      // Log analytics event
+      const { isNewUser } = useAuthStore.getState();
+      await baihubAnalytics.logResendOtpClicked({
+        phone_number: phone,
+        user_type: isNewUser ? 'new' : 'old',
+        screen: 'otp_screen',
+      });
       setTimer(30);
       setCanResend(false);
       setOtp(['', '', '', '']);
@@ -187,12 +203,7 @@ export default function OTPVerificationScreen({ navigation, route }: any) {
           )}
         </View>
 
-        {/* Help Text */}
-        <View style={styles.helpContainer}>
-          <RNText style={styles.helpText}>
-            For testing, use OTP: <Text style={styles.helpCode}>1234</Text>
-          </RNText>
-        </View>
+
       </ScrollView>
     </KeyboardAvoidingView>
   );

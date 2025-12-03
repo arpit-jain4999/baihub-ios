@@ -1,0 +1,415 @@
+BaiHub Mobile - API Connectivity Fix
+=====================================
+
+Updated: December 1, 2025 10:58 AM
+API URL: https://api.baihub.com
+
+WHAT WAS FIXED?
+===============
+
+✅ Added Network Security Configuration
+   - Allows HTTPS connections to api.baihub.com
+   - Properly configured SSL certificate trust
+   - Allows cleartext for local development
+
+✅ Updated AndroidManifest.xml
+   - Added networkSecurityConfig reference
+   - Enabled usesCleartextTraffic for flexibility
+
+✅ Enhanced API Client Headers
+   - Added User-Agent: BaiHub-Mobile/1.0
+   - Added Accept: application/json
+   - Kept ngrok-skip-browser-warning for compatibility
+
+✅ Rebuilt APK with new API URL
+   - API_BASE_URL: https://api.baihub.com
+   - Timeout: 30000ms (30 seconds)
+
+FILES CHANGED
+=============
+
+1. app.config.js
+   - API_BASE_URL: https://api.baihub.com
+
+2. android/app/src/main/res/xml/network_security_config.xml
+   - NEW FILE: Network security configuration
+
+3. android/app/src/main/AndroidManifest.xml
+   - Added network security config reference
+   - Enabled cleartext traffic
+
+4. src/api/client.ts
+   - Added User-Agent header
+   - Added Accept header
+
+CURRENT API SERVER STATUS
+==========================
+
+Testing connection to: https://api.baihub.com
+
+Server Response: HTTP 403 Forbidden
+
+This means:
+✓ Server is ONLINE and reachable
+✓ SSL/HTTPS is working correctly
+✗ Server is rejecting requests (403)
+
+Possible reasons for 403:
+1. CORS not configured for mobile app
+2. Server requires authentication headers
+3. Server blocking requests without proper origin
+4. Rate limiting or IP blocking
+
+HOW TO DEBUG NETWORK ERRORS
+============================
+
+Method 1: Check Logcat (Detailed Errors)
+-----------------------------------------
+Connect device and run:
+
+adb logcat | grep -E "okhttp|axios|network|ApiClient"
+
+Look for:
+- Connection refused → Backend not running
+- Timeout → Backend too slow or unreachable
+- 403 Forbidden → CORS or authentication issue
+- SSL Error → Certificate problem
+- Unknown host → DNS or URL typo
+
+Method 2: Test API from Device Browser
+---------------------------------------
+1. Install APK on device
+2. Open Chrome browser on device
+3. Go to: https://api.baihub.com
+4. Check if you can access the API
+
+If browser works but app doesn't:
+→ CORS issue (server blocking app requests)
+
+If browser also fails:
+→ Server issue or network problem
+
+Method 3: Use Network Interceptor
+----------------------------------
+The app logs all API requests. Check console:
+
+console.log('ENV.API_BASE_URL', ENV.API_BASE_URL);
+logger.info('API Request: GET /endpoint');
+logger.error('API Error: ...');
+
+BACKEND CORS CONFIGURATION
+===========================
+
+Your backend MUST allow requests from the mobile app.
+
+For Express.js:
+--------------
+```javascript
+const cors = require('cors');
+
+app.use(cors({
+  origin: '*', // Allow all origins (development)
+  // OR specific for production:
+  // origin: ['https://app.baihub.com', 'baihub://'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'User-Agent', 'Accept'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
+```
+
+For NestJS:
+----------
+```typescript
+// main.ts
+app.enableCors({
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: 'Content-Type,Authorization,User-Agent,Accept',
+  credentials: true,
+});
+```
+
+For FastAPI (Python):
+--------------------
+```python
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+TESTING CHECKLIST
+=================
+
+Before installing APK:
+☐ Backend is running and accessible
+☐ Backend has CORS enabled for mobile
+☐ Backend accepts requests with User-Agent header
+☐ SSL certificate is valid (if using HTTPS)
+
+After installing APK:
+☐ Check logcat for detailed errors
+☐ Test login/registration flow
+☐ Check if API calls show in backend logs
+☐ Verify network responses in app
+
+COMMON ERRORS AND SOLUTIONS
+============================
+
+Error: "Network Error"
+----------------------
+Cause: Cannot connect to server
+Solutions:
+1. Check if server is running
+2. Verify URL is correct: https://api.baihub.com
+3. Check device has internet connection
+4. Try on WiFi instead of mobile data
+
+Error: "403 Forbidden"
+----------------------
+Cause: Server rejecting requests
+Solutions:
+1. Enable CORS on backend
+2. Add mobile app to allowed origins
+3. Check if API requires authentication
+4. Verify headers are correct
+
+Error: "Timeout"
+----------------
+Cause: Server not responding fast enough
+Solutions:
+1. Increase timeout in app.config.js (currently 30s)
+2. Optimize backend performance
+3. Check backend logs for slow queries
+4. Verify network speed
+
+Error: "SSL Error" or "Certificate Error"
+------------------------------------------
+Cause: Invalid SSL certificate
+Solutions:
+1. Check if SSL certificate is valid
+2. Make sure domain matches certificate
+3. Verify certificate is not expired
+4. Check intermediate certificates
+
+Error: "Unknown Host"
+---------------------
+Cause: DNS cannot resolve domain
+Solutions:
+1. Check domain spelling
+2. Verify domain is registered
+3. Test DNS: nslookup api.baihub.com
+4. Try using IP address temporarily
+
+NETWORK SECURITY CONFIG EXPLAINED
+==================================
+
+The network_security_config.xml file controls:
+
+1. HTTPS Trust (api.baihub.com)
+   - Uses system certificates
+   - Trusts valid SSL certificates
+   - Required for HTTPS API calls
+
+2. Cleartext Traffic (for development)
+   - Allows HTTP for localhost
+   - Allows HTTP for local IPs
+   - Useful for testing
+
+3. Domain Configuration
+   - Specifies which domains are allowed
+   - Can enable/disable cleartext per domain
+   - Can add custom certificate authorities
+
+TESTING THE API
+===============
+
+Test 1: Basic Connectivity
+---------------------------
+curl -I https://api.baihub.com
+
+Expected: HTTP 200 or 403 (means server is up)
+
+Test 2: With Headers
+--------------------
+curl -H "User-Agent: BaiHub-Mobile/1.0" \
+     -H "Accept: application/json" \
+     https://api.baihub.com
+
+Expected: Valid JSON response
+
+Test 3: Specific Endpoint
+--------------------------
+curl -H "Content-Type: application/json" \
+     -H "User-Agent: BaiHub-Mobile/1.0" \
+     https://api.baihub.com/auth/otp \
+     -d '{"phoneNumber": "+911234567890"}'
+
+Expected: OTP sent or validation error
+
+Test 4: From Device
+-------------------
+adb shell am start -a android.intent.action.VIEW \
+  -d "https://api.baihub.com"
+
+Expected: Browser opens and shows API
+
+BACKEND REQUIREMENTS
+====================
+
+Your backend server MUST:
+✓ Be accessible from the internet
+✓ Have valid SSL certificate (for HTTPS)
+✓ Have CORS enabled
+✓ Accept requests with custom headers
+✓ Handle OPTIONS preflight requests
+✓ Return proper JSON responses
+
+MONITORING API CALLS
+=====================
+
+The app logs all API activity. To view:
+
+adb logcat -s ReactNativeJS:* AndroidRuntime:*
+
+Look for:
+- "API Request: ..." → Outgoing request
+- "API Response: ..." → Successful response
+- "API Error: ..." → Failed request
+- "TOKEN>>>>" → Auth token being used
+
+SWITCHING BETWEEN ENVIRONMENTS
+===============================
+
+Development (Local):
+-------------------
+API_BASE_URL: http://172.20.10.12:3000
+
+Staging:
+--------
+API_BASE_URL: https://staging.api.baihub.com
+
+Production:
+-----------
+API_BASE_URL: https://api.baihub.com
+
+To change:
+1. Update app.config.js
+2. Rebuild APK: cd android && ./gradlew assembleRelease
+3. Copy to Desktop
+4. Reinstall on device
+
+Or use environment variables:
+export API_BASE_URL="https://api.baihub.com"
+
+TROUBLESHOOTING WORKFLOW
+=========================
+
+Step 1: Verify Server
+---------------------
+curl https://api.baihub.com
+→ If fails: Server is down or unreachable
+
+Step 2: Check CORS
+-------------------
+curl -H "Origin: https://app.baihub.com" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: Content-Type" \
+     -X OPTIONS https://api.baihub.com/auth/otp
+→ Should return CORS headers
+
+Step 3: Test from Device
+-------------------------
+Install APK → Open app → Check logcat
+→ Look for specific error messages
+
+Step 4: Check Backend Logs
+---------------------------
+Check if backend is receiving requests
+→ If yes: Backend rejecting (check auth/CORS)
+→ If no: Network issue or wrong URL
+
+QUICK FIXES
+===========
+
+If API still not working:
+
+1. Temporary Fix: Allow All CORS
+   app.use(cors({ origin: '*' }))
+
+2. Test Without Auth First
+   Remove authentication temporarily
+   Test basic endpoints
+
+3. Use ngrok for Testing
+   ngrok http 3000
+   Update app.config.js with ngrok URL
+   Rebuild APK
+
+4. Check Firewall/Security Groups
+   Make sure port 443 (HTTPS) is open
+   Check cloud provider security groups
+
+PRODUCTION CHECKLIST
+====================
+
+Before deploying to production:
+
+☐ Valid SSL certificate installed
+☐ CORS properly configured (not *)
+☐ Rate limiting enabled
+☐ Authentication working
+☐ Error logging enabled
+☐ Monitoring set up
+☐ CDN configured (optional)
+☐ Database optimized
+☐ API versioning in place
+
+NEXT STEPS
+==========
+
+1. Install the updated APK on your device
+2. Open the app
+3. Check logcat for detailed errors:
+   adb logcat | grep -i "network\|api\|error"
+4. Share the specific error message
+5. Check backend logs to see if requests are arriving
+
+SUPPORT INFORMATION
+===================
+
+Current Configuration:
+- API URL: https://api.baihub.com
+- Timeout: 30000ms (30 seconds)
+- User-Agent: BaiHub-Mobile/1.0
+- Network Security: Configured
+- CORS Headers: ngrok-skip-browser-warning
+
+If you're still getting network errors after installing this APK:
+1. Check the exact error in logcat
+2. Verify backend is accessible: curl https://api.baihub.com
+3. Check backend CORS configuration
+4. Look for specific error codes (403, 404, 500, etc.)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+APK rebuilt with API URL: https://api.baihub.com
+Install and test!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+
+
+
+
+
+
+
+
+

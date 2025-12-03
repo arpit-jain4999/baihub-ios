@@ -22,6 +22,9 @@ class ApiClient {
       timeout: ENV.API_TIMEOUT,
       headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning
+        'User-Agent': 'BaiHub-Mobile/1.0',
+        'Accept': 'application/json',
       },
     });
     console.log('ENV.API_BASE_URL', ENV.API_BASE_URL);
@@ -49,6 +52,8 @@ class ApiClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+
+        logger.info('TOKEN>>>>', token)
 
         logger.debug(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
           params: config.params,
@@ -174,6 +179,8 @@ class ApiClient {
   }
 
   async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    console.log('POST URL', url, ENV.API_BASE_URL);
+    console.log('POST DATA', data);
     const response = await this.client.post<ApiResponse<T>>(url, data, config);
     return response.data;
   }

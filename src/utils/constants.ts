@@ -20,6 +20,7 @@ export const ENV = {
   API_BASE_URL: getEnvVar('API_BASE_URL', 'http://10.0.2.2:3000'),
   API_TIMEOUT: parseInt(getEnvVar('API_TIMEOUT', '30000'), 10),
   ENVIRONMENT: (getEnvVar('ENVIRONMENT', 'development') as 'development' | 'staging' | 'production'),
+  APP_ENVIRONMENT: (getEnvVar('APP_ENVIRONMENT', 'dev') as 'dev' | 'production'),
 };
 
 export const API_ENDPOINTS = {
@@ -39,6 +40,15 @@ export const API_ENDPOINTS = {
   },
   CATEGORIES: '/categories',
   REVIEWS: '/reviews',
+  AREAS: {
+    SEARCH: '/areas/search',
+    BY_CATEGORY: '/areas/by-category',
+  },
+  PLANS: '/plans',
+  TIME_SLOTS: '/time-slots',
+  ORDERS: '/orders',
+  ORDERS_ME: '/orders/me',
+  ORDER_DETAILS: (orderId: string) => `/orders/${orderId}`,
 } as const;
 
 export const STORAGE_KEYS = {
