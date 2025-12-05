@@ -17,6 +17,7 @@ module.exports = {
     ios: {
       bundleIdentifier: 'com.baihub.app',
       supportsTablet: true,
+      buildNumber: '1',
       infoPlist: {
         NSLocationWhenInUseUsageDescription: 'This app needs access to your location to automatically detect your city. You can enter your city manually if you prefer not to share your location.',
         ITSAppUsesNonExemptEncryption: false,
