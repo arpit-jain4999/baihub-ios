@@ -4,7 +4,7 @@ module.exports = {
   expo: {
     name: 'Baihub',
     slug: 'baihub-mobile',
-    version: '1.0.1',
+    version: '1.0.2',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -28,7 +28,7 @@ module.exports = {
       },
     },
     android: {
-      versionCode: 2,
+      versionCode: 3,
       adaptiveIcon: {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#ffcc00', // Matches the yellow background in your image
@@ -61,6 +61,7 @@ module.exports = {
       '@react-native-firebase/app',
       './plugins/with-google-services.js',
       './plugins/with-modular-headers.js',
+      './plugins/with-remove-ad-id.js', // Remove AD_ID permission
     ],
   },
 };
