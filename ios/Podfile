@@ -1,0 +1,47 @@
+require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
+require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
+
+platform :ios, '15.1'
+
+prepare_react_native_project!
+
+target 'baihubmobile' do
+  use_expo_modules!
+  use_modular_headers!
+
+  config = use_native_modules!
+
+  # Expo needs static frameworks when using use_frameworks!
+  use_frameworks! :linkage => :static
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => true,
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    :privacy_file_aggregation_enabled => true
+  )
+
+  # Firebase pods (used by RNFirebase under the hood)
+  pod 'Firebase/Core'
+  pod 'Firebase/Analytics'
+  pod 'Firebase/Messaging'
+end
+
+post_install do |installer|
+  react_native_post_install(installer)
+
+  # Relax non-modular header warnings so Expo + RNFB play nice
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+    config.build_settings['CLANG_WARN_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'NO'
+    config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+  end
+
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      config.build_settings['CLANG_WARN_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'NO'
+      config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+    end
+  end
+end
