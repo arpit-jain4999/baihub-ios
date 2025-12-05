@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "baihubmobile.app"
-               BlueprintName = "baihubmobile"
-               ReferencedContainer = "container:baihubmobile.xcodeproj">
+               BuildableName = "Baihub.app"
+               BlueprintName = "Baihub"
+               ReferencedContainer = "container:Baihub.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "baihubmobileTests.xctest"
-               BlueprintName = "baihubmobileTests"
-               ReferencedContainer = "container:baihubmobile.xcodeproj">
+               BuildableName = "BaihubTests.xctest"
+               BlueprintName = "BaihubTests"
+               ReferencedContainer = "container:Baihub.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "baihubmobile.app"
-            BlueprintName = "baihubmobile"
-            ReferencedContainer = "container:baihubmobile.xcodeproj">
+            BuildableName = "Baihub.app"
+            BlueprintName = "Baihub"
+            ReferencedContainer = "container:Baihub.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "baihubmobile.app"
-            BlueprintName = "baihubmobile"
-            ReferencedContainer = "container:baihubmobile.xcodeproj">
+            BuildableName = "Baihub.app"
+            BlueprintName = "Baihub"
+            ReferencedContainer = "container:Baihub.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

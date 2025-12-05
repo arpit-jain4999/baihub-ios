@@ -20,7 +20,6 @@ module.exports = {
       buildNumber: '1',
       infoPlist: {
         NSLocationWhenInUseUsageDescription: 'This app needs access to your location to automatically detect your city. You can enter your city manually if you prefer not to share your location.',
-        NSPhotoLibraryUsageDescription: 'This app may need access to your photo library to allow you to upload profile pictures or images for service bookings. This access is optional and you can use the app without granting photo library access.',
         ITSAppUsesNonExemptEncryption: false,
       },
       googleServicesFile: './GoogleService-Info.plist',
