@@ -45,22 +45,28 @@ const withGoogleServices = (config) => {
   // Handle iOS: Copy GoogleService-Info.plist
   config = withDangerousMod(config, [
     'ios',
-    async (config) => {
-      const projectRoot = config.modRequest.projectRoot;
-      const iosProjectPath = config.modRequest.platformProjectRoot;
+    async (modConfig) => {
+      const projectRoot = modConfig.modRequest.projectRoot;
+      const iosProjectPath = modConfig.modRequest.platformProjectRoot;
       const sourceFile = path.join(projectRoot, 'GoogleService-Info.plist');
+      
+      // Get expo config safely - it might be in different places depending on context
+      const expoConfig = modConfig.expo || config.expo || {};
       
       // Find the iOS project folder (usually matches slug without dashes)
       // Try common patterns: slug without dashes, bundle ID last part, or 'baihubmobile'
-      let projectName = config.expo.slug?.replace(/-/g, '') || 
-                       config.expo.ios?.bundleIdentifier?.split('.').pop() || 
+      const slug = expoConfig.slug || 'baihub-mobile';
+      const bundleId = expoConfig.ios?.bundleIdentifier || 'com.baihub.app';
+      
+      let projectName = slug.replace(/-/g, '') || 
+                       bundleId.split('.').pop() || 
                        'baihubmobile';
       
       // Check if the folder exists, if not try alternative names
       const possibleNames = [
         projectName,
         'baihubmobile', // Known folder name
-        config.expo.slug?.replace(/-/g, ''),
+        slug.replace(/-/g, ''),
       ].filter(Boolean);
       
       let targetFile = null;
@@ -75,7 +81,7 @@ const withGoogleServices = (config) => {
       
       // If no folder found, use the first possible name (will be created during prebuild)
       if (!targetFile) {
-        projectName = possibleNames[0];
+        projectName = possibleNames[0] || 'baihubmobile';
         targetFile = path.join(iosProjectPath, projectName, 'GoogleService-Info.plist');
       }
 
@@ -97,7 +103,7 @@ const withGoogleServices = (config) => {
       fs.copyFileSync(sourceFile, targetFile);
       console.log(`✅ Copied GoogleService-Info.plist to ios/${projectName}/`);
 
-      return config;
+      return modConfig;
     },
   ]);
 

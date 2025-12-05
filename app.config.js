@@ -2,7 +2,7 @@
 
 module.exports = {
   expo: {
-    name: 'baihub-mobile',
+    name: 'Baihub',
     slug: 'baihub-mobile',
     version: '1.0.0',
     orientation: 'portrait',
@@ -28,8 +28,8 @@ module.exports = {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: './assets/icon.png',  // Use same icon as iOS for consistency
-        backgroundColor: '#ffffff',
+        foregroundImage: './assets/adaptive-icon.png',
+        backgroundColor: '#ffcc00', // Matches the yellow background in your image
       },
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
