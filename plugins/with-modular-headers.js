@@ -78,6 +78,28 @@ function withModularHeaders(config) {
           fs.writeFileSync(podfilePath, podfileContent);
           console.log('✅ Added architecture fix to Podfile');
         }
+
+        // Add CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES fix for Firebase
+        if (!podfileContent.includes('CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES')) {
+          const firebaseFix = `
+    # Fix for Firebase non-modular header includes
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      end
+    end`;
+
+          // Add after react_native_post_install
+          podfileContent = podfileContent.replace(
+            /(react_native_post_install\([^)]+\))/,
+            `$1${firebaseFix}`
+          );
+
+          fs.writeFileSync(podfilePath, podfileContent);
+          console.log('✅ Added CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES fix to Podfile');
+        } else {
+          console.log('✅ CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES already in Podfile');
+        }
       }
 
       return config;
